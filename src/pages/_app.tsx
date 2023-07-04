@@ -6,7 +6,7 @@ import type { AppProps } from "next/app";
 
 const MyApp: AppType = ({ Component, pageProps }: AppProps) => {
   return (
-    <ClerkProvider {...pageProps}>
+    <ClerkProvider {...pageProps} publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <Component {...pageProps} />
     </ClerkProvider>
   );
