@@ -1,9 +1,36 @@
 import Head from "next/head";
-import Link from "next/link";
 import { api } from "~/utils/api";
-import { SignUp, useUser, SignIn } from "@clerk/nextjs";
+import { useUser, SignIn } from "@clerk/nextjs";
 import { useRouter } from 'next/router'
-import { useEffect } from "react";
+import { useState } from "react";
+
+function ProfileNameForm() {
+    const [profileName, setProfileName] = useState("");
+
+    const onNameChange = (e: React.FormEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        setProfileName(e.currentTarget.value);
+    }
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const res = api
+        console.log(profileName);
+    }
+
+    return (
+        <form className="w-full max-w-sm" onSubmit={handleSubmit}>
+            <div>Enter your profile name</div><br />
+            <div className="flex items-center border-b border-teal-500 py-2">
+                <input className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter here!" aria-label="Full name" value={profileName} onChange={onNameChange}/>
+                <button className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
+                    Enter
+                </button>
+            </div>
+        </form>        
+
+    )
+}
 
 export default function Home() {
     const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -25,11 +52,7 @@ export default function Home() {
     }
 
     if (isSignedIn && user && !user.publicMetadata?.profileName) {
-        console.log("her");
-        return (
-            <>enter name</>
-        )
-        // edit
+        return <ProfileNameForm />
     }
 
     return (
