@@ -6,6 +6,8 @@ import { useState } from "react";
 
 function ProfileNameForm() {
     const [profileName, setProfileName] = useState("");
+    const [error, setError] = useState("");
+    const mutation = api.user.addProfileName.useMutation();
 
     const onNameChange = (e: React.FormEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -14,8 +16,19 @@ function ProfileNameForm() {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const res = api
-        console.log(profileName);
+        mutation.mutate({ profileName });
+
+        {/*while (mutation.status !== "success" && mutation.status !== "error") {
+            console.log("tst");
+        }*/}
+
+        if (mutation?.data?.code === "success") {
+
+        } else if (mutation?.data?.code === "exists") {
+            setError("This username is already taken. Please try another.");
+        } else {
+
+        }
     }
 
     return (
@@ -27,16 +40,14 @@ function ProfileNameForm() {
                     Enter
                 </button>
             </div>
+            {mutation.error ? <div>error</div> : <></>}
         </form>        
 
     )
 }
 
 export default function Home() {
-    const hello = api.example.hello.useQuery({ text: "from tRPC" });
     const { isLoaded, isSignedIn, user } = useUser();
-    const router = useRouter();
-
 
     if (!isLoaded) {
 

@@ -13,7 +13,11 @@ export const userRouter = createTRPCRouter({
     }),
     addProfileName: privateProcedure
     .input(z.object({ profileName: z.string( )}))
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
+        return {
+            code: "failure"
+        };
+
         const res = await ctx.prisma.user.findUnique({ where: { profileName: input.profileName }});
 
         if (res) {
@@ -24,9 +28,13 @@ export const userRouter = createTRPCRouter({
 
         const add = await ctx.prisma.user.create({ data: { id: ctx.userId, profileName: input.profileName}});
 
-        if (!add) {
+        const clerkRes = await clerkClient.users.updateUserMetadata(ctx.userId, { publicMetadata: {
+            profileName: input.profileName
+        }});
+
+        if (!add || !clerkRes) {
             return {
-                code: "failure'"
+                code: "failure"
             }
         }
 
