@@ -22,6 +22,10 @@ function ProfileNameForm() {
             console.log("tst");
         }*/}
 
+        while (mutation.isLoading) {
+
+        }
+
         if (mutation?.data?.code === "success") {
 
         } else if (mutation?.data?.code === "exists") {
@@ -40,7 +44,7 @@ function ProfileNameForm() {
                     Enter
                 </button>
             </div>
-            {mutation.error ? <div>error</div> : <></>}
+            {error ? <div>{error}</div> : <></>}
         </form>        
 
     )
