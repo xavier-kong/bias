@@ -1,10 +1,10 @@
 import Head from "next/head";
 import { api } from "~/utils/api";
 import { useUser, SignIn } from "@clerk/nextjs";
-import { useRouter } from 'next/router'
+import { Router, useRouter } from 'next/router'
 import { useState } from "react";
 
-function ProfileNameForm() {
+function ProfileNameForm({ router: Router }) {
     const [profileName, setProfileName] = useState("");
     const [error, setError] = useState("");
     const mutation = api.user.addProfileName.useMutation();
@@ -23,15 +23,15 @@ function ProfileNameForm() {
         }*/}
 
         while (mutation.isLoading) {
-
+            <Spinner />
         }
 
         if (mutation?.data?.code === "success") {
-
+            router.push("/");
         } else if (mutation?.data?.code === "exists") {
             setError("This username is already taken. Please try another.");
         } else {
-
+            setError("An error has ocurred. Please try submitting again.");
         }
     }
 
@@ -52,6 +52,7 @@ function ProfileNameForm() {
 
 export default function Home() {
     const { isLoaded, isSignedIn, user } = useUser();
+    const router = useRouter();
 
     if (!isLoaded) {
 
@@ -67,7 +68,7 @@ export default function Home() {
     }
 
     if (isSignedIn && user && !user.publicMetadata?.profileName) {
-        return <ProfileNameForm />
+        return <ProfileNameForm router={router}/>
     }
 
     return (
