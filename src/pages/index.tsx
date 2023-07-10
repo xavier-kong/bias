@@ -1,13 +1,16 @@
 import Head from "next/head";
 import { api } from "~/utils/api";
 import { useUser, SignIn } from "@clerk/nextjs";
-import { Router, useRouter } from 'next/router'
 import { useState } from "react";
+import Spinner from "~/components/spinner";
 
-function ProfileNameForm({ router: Router }) {
+function ProfileNameForm() {
     const [profileName, setProfileName] = useState("");
-    const [error, setError] = useState("");
-    const mutation = api.user.addProfileName.useMutation();
+    const mutation = api.user.addProfileName.useMutation({
+        onSuccess: () => {
+            window.location.reload();
+        }
+    });
 
     const onNameChange = (e: React.FormEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -17,22 +20,6 @@ function ProfileNameForm({ router: Router }) {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         mutation.mutate({ profileName });
-
-        {/*while (mutation.status !== "success" && mutation.status !== "error") {
-            console.log("tst");
-        }*/}
-
-        while (mutation.isLoading) {
-            <Spinner />
-        }
-
-        if (mutation?.data?.code === "success") {
-            router.push("/");
-        } else if (mutation?.data?.code === "exists") {
-            setError("This username is already taken. Please try another.");
-        } else {
-            setError("An error has ocurred. Please try submitting again.");
-        }
     }
 
     return (
@@ -40,19 +27,19 @@ function ProfileNameForm({ router: Router }) {
             <div>Enter your profile name</div><br />
             <div className="flex items-center border-b border-teal-500 py-2">
                 <input className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter here!" aria-label="Full name" value={profileName} onChange={onNameChange}/>
-                <button className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
-                    Enter
-                </button>
+                {
+                    mutation.isLoading ? <Spinner /> : <button className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
+                        Enter
+                    </button>
+                }
             </div>
-            {error ? <div>{error}</div> : <></>}
+            {mutation.error ? <div>{mutation.error.message}</div> : <></>}
         </form>        
-
     )
 }
 
 export default function Home() {
     const { isLoaded, isSignedIn, user } = useUser();
-    const router = useRouter();
 
     if (!isLoaded) {
 
@@ -68,7 +55,7 @@ export default function Home() {
     }
 
     if (isSignedIn && user && !user.publicMetadata?.profileName) {
-        return <ProfileNameForm router={router}/>
+        return <ProfileNameForm />
     }
 
     return (

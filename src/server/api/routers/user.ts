@@ -14,16 +14,10 @@ export const userRouter = createTRPCRouter({
     addProfileName: privateProcedure
     .input(z.object({ profileName: z.string( )}))
     .mutation(async ({ input, ctx }) => {
-        return {
-            code: "failure"
-        };
-
         const res = await ctx.prisma.user.findUnique({ where: { profileName: input.profileName }});
 
         if (res) {
-            return {
-                code: "exists"
-            }
+            throw new TRPCError({ message: "This username is already taken. Please try another.", code: "BAD_REQUEST"});
         }
 
         const add = await ctx.prisma.user.create({ data: { id: ctx.userId, profileName: input.profileName}});
@@ -33,13 +27,7 @@ export const userRouter = createTRPCRouter({
         }});
 
         if (!add || !clerkRes) {
-            return {
-                code: "failure"
-            }
-        }
-
-        return {
-            code: "success"
+            throw new TRPCError({ message: "An error has ocurred. Please try submitting again.", code: "INTERNAL_SERVER_ERROR"});
         }
     })
 });
