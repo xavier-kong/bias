@@ -20,11 +20,11 @@ export const userRouter = createTRPCRouter({
             throw new TRPCError({ message: "This username is already taken. Please try another.", code: "BAD_REQUEST"});
         }
 
-        const add = await ctx.prisma.user.create({ data: { id: ctx.userId, profileName: input.profileName}});
-
         const clerkRes = await clerkClient.users.updateUserMetadata(ctx.userId, { publicMetadata: {
             profileName: input.profileName
         }});
+
+        const add = await ctx.prisma.user.create({ data: { id: ctx.userId, profileName: input.profileName}});
 
         if (!add || !clerkRes) {
             throw new TRPCError({ message: "An error has ocurred. Please try submitting again.", code: "INTERNAL_SERVER_ERROR"});
