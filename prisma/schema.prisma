@@ -16,3 +16,13 @@ model User {
   id  String @unique
   profileName String @unique
 }
+
+model Bias {
+  id String @id @default(autoincrement())
+  userId String @relation()
+  memberId String
+}
+
+model Member {
+  id String @id @
+}

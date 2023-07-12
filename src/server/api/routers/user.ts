@@ -4,13 +4,6 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
-    hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-        return {
-            greeting: `Hello ${input.text}`,
-        };
-    }),
     addProfileName: privateProcedure
     .input(z.object({ profileName: z.string( )}))
     .mutation(async ({ input, ctx }) => {
@@ -29,5 +22,9 @@ export const userRouter = createTRPCRouter({
         if (!add || !clerkRes) {
             throw new TRPCError({ message: "An error has ocurred. Please try submitting again.", code: "INTERNAL_SERVER_ERROR"});
         }
-    })
+    }),
+    fetchUserBiases: privateProcedure
+    .query(({ ctx }) => {
+        const userBiases = await ctx.prisma.bias.findAll({ data: })
+    }),
 });
