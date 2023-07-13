@@ -24,7 +24,22 @@ export const userRouter = createTRPCRouter({
         }
     }),
     fetchUserBiases: privateProcedure
-    .query(({ ctx }) => {
-        const userBiases = await ctx.prisma.bias.findAll({ data: })
+    .query(async ({ ctx }) => {
+        const userBiases = await ctx.prisma.bias.findMany({ 
+            where: { 
+                userId: ctx.userId 
+            },
+            include: {
+                member: {
+                    include: {
+                        group: true
+                    }
+                }
+            }
+        });
+
+        return {
+            userBiases
+        };
     }),
 });

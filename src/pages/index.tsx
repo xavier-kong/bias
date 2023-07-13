@@ -58,6 +58,12 @@ export default function Home() {
         return <ProfileNameForm />
     }
 
+    const biases = api.user.fetchUserBiases.useQuery();
+
+    while (biases.isLoading) {
+        return <Spinner />
+    }
+
 
     return (
         <>
@@ -68,6 +74,7 @@ export default function Home() {
             </Head>
             <main className="flex min-h-screen flex-col items-center justify-center">
                 Edit
+                {JSON.stringify(biases.data)}
             </main>
         </>
     );

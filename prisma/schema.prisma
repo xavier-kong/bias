@@ -6,23 +6,39 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl         = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
 }
 
 model User {
-  id  String @unique
+  id          String @unique
   profileName String @unique
+  Bias        Bias[]
 }
 
-model Bias {
-  id String @id @default(autoincrement())
-  userId String @relation()
-  memberId String
+model Group {
+  id      Int      @id @default(autoincrement())
+  name    String
+  logoUrl String
+  Member  Member[]
 }
 
 model Member {
-  id String @id @
+  id      Int    @id @default(autoincrement())
+  group   Group  @relation(fields: [groupId], references: [id])
+  groupId Int
+  enName  String
+  krName  String
+  picUrl  String
+  Bias    Bias[]
+}
+
+model Bias {
+  id       Int    @id @default(autoincrement())
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+  member   Member @relation(fields: [memberId], references: [id])
+  memberId Int
 }
