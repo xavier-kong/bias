@@ -38,32 +38,58 @@ function ProfileNameForm() {
     )
 }
 
-export default function Home() {
-    const { isLoaded, isSignedIn, user } = useUser();
+function AddBiasForm() {
+    const membersQuery = api.group.fetchAllMembers.useQuery();
+    const [ selectedGroup, setSelectedGroup ] = useState("");
 
-    if (!isLoaded) {
-
+    while (membersQuery.isLoading) {
+        return <Spinner />;
     }
 
-    if (!isSignedIn) {
-        return (
-            <div>
-                Test
-                <SignIn />
+    const groups = membersQuery.data?.groups;
+    const members = membersQuery.data?.members;
+
+    return (
+        <div>
+            Addbias form {selectedGroup}
+            <div className="relative w-full lg:max-w-sm">
+                <select className="w-full p-2.5 text-gray-500 bg-white border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600" onChange={
+                    e => {
+                        e.preventDefault();
+                        setSelectedGroup(e.target.name);
+                    }
+                    }>
+                    <option>ReactJS Dropdown</option>
+                    <option>Laravel 9 with React</option>
+                    <option>React with Tailwind CSS</option>
+                    <option>React With Headless UI</option>
+                </select>
             </div>
-        )
+            {
+                selectedGroup ? <div>member selector</div> : <div></div>
+            }
+        </div>
+    )
+
+}
+
+export default function Home() {
+    const { isLoaded, isSignedIn, user } = useUser();
+    const [ showAddForm, setShowAddFrom ] = useState(false);
+    const biases = api.user.fetchUserBiases.useQuery();
+
+    if (!isSignedIn) {
+        return (<div>Test<SignIn /></div>)
     }
 
     if (isSignedIn && user && !user.publicMetadata?.profileName) {
         return <ProfileNameForm />
     }
 
-    const biases = api.user.fetchUserBiases.useQuery();
 
     while (biases.isLoading) {
         return <Spinner />
     }
-
 
     return (
         <>
@@ -73,8 +99,30 @@ export default function Home() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className="flex min-h-screen flex-col items-center justify-center">
-                Edit
-                {JSON.stringify(biases.data)}
+                <table className="table-auto">
+                    <thead>
+                        <tr>
+                            <th>Group</th>
+                            <th>Member</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            biases.data?.userBiases?.map(bias => {
+                                return (
+                                    <tr key={bias.memberId}>
+                                        <td>{bias.member.group.name}</td>
+                                        <td>{bias.member.enName}</td>
+                                    </tr>
+                                )
+                            })
+                        }
+                    </tbody>
+                </table>
+                {
+                    showAddForm ? <AddBiasForm /> : 
+                        <button onClick={() => setShowAddFrom(true)}>Add</button>
+                }
             </main>
         </>
     );
