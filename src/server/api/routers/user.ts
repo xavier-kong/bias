@@ -42,4 +42,10 @@ export const userRouter = createTRPCRouter({
             userBiases
         };
     }),
+    addUserBias: privateProcedure
+    .input(z.object({ memberId: z.number( )}))
+    .mutation(async ({ input, ctx }) => {
+    }),
+    updateUserBias: privateProcedure
+
 });

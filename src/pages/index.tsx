@@ -38,35 +38,71 @@ function ProfileNameForm() {
     )
 }
 
-function AddBiasForm() {
+function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number) => void }) {
     const membersQuery = api.group.fetchAllMembers.useQuery();
     const [ selectedGroup, setSelectedGroup ] = useState("");
+    const [ selectedGroupId, setSelectedGroupId ] = useState<number | undefined>();
+    const [ selectedMember, setSelectedMember ] = useState<string | undefined>();
+    const [ selectedMemberId, setSelectedMemberId ] = useState<number | undefined>();
 
     while (membersQuery.isLoading) {
         return <Spinner />;
     }
 
     const groups = membersQuery.data?.groups;
+    if (!groups || groups.length === 0) throw new Error('no groups');
+
     const members = membersQuery.data?.members;
+    if (!members) throw new Error('no members');
 
     return (
         <div>
-            Addbias form {selectedGroup}
+            Addbias form
             <div className="relative w-full lg:max-w-sm">
                 <select className="w-full p-2.5 text-gray-500 bg-white border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600" onChange={
                     e => {
                         e.preventDefault();
-                        setSelectedGroup(e.target.name);
+                        setSelectedGroup(e.target.value);
+                        setSelectedGroupId(e.target.options.selectedIndex);
+                    }}
+                    value={selectedGroup}>
+                    <option key="empty">Select a group...</option>
+                    {
+                        groups.map(group => {
+                            return <option key={group.id}>{group.enName}</option>
+                        })
                     }
-                    }>
-                    <option>ReactJS Dropdown</option>
-                    <option>Laravel 9 with React</option>
-                    <option>React with Tailwind CSS</option>
-                    <option>React With Headless UI</option>
                 </select>
             </div>
             {
-                selectedGroup ? <div>member selector</div> : <div></div>
+                selectedGroup ?             
+                    <div className="relative w-full lg:max-w-sm">
+                        <select className="w-full p-2.5 text-gray-500 bg-white border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600" onChange={
+                            e => {
+                                e.preventDefault();
+                                setSelectedMember(e.target.value);
+                                setSelectedMemberId(e.target.options.selectedIndex);
+                            }}
+                            value={selectedMember}>
+                            <option key="empty">Select a member...</option>
+                            {
+                                members.filter(member => member.group.enName === selectedGroup)
+                                .map(member => (
+                                    <option key={member.id}>{member.enName}</option>
+                                ))
+                            }
+                        </select>
+                    </div> : <div></div>
+            }
+            {
+                selectedMember ? <button onClick={(e) => {
+                    e.preventDefault();
+                    if (selectedMemberId && selectedGroupId) {
+                        addBias(selectedMemberId, selectedGroupId);
+                    } else {
+                        // error
+                    }
+                }}>submit</button> : <div></div>
             }
         </div>
     )
@@ -86,10 +122,24 @@ export default function Home() {
         return <ProfileNameForm />
     }
 
-
     while (biases.isLoading) {
         return <Spinner />
     }
+
+    const addBias = (memberId: number, groupId: number) => {
+        const alreadyHasBias = biases.data?.userBiases.some(bias => bias.memberId === memberId);
+        if (alreadyHasBias) {
+            // early return
+        }
+
+        const hasGroupBias = biases.data?.userBiases.some(bias => bias.member.groupId === groupId);
+        if (hasGroupBias) {
+            // update not add
+        } else {
+            // add new bias
+        }
+    }
+
 
     return (
         <>
@@ -111,7 +161,7 @@ export default function Home() {
                             biases.data?.userBiases?.map(bias => {
                                 return (
                                     <tr key={bias.memberId}>
-                                        <td>{bias.member.group.name}</td>
+                                        <td>{bias.member.group.enName}</td>
                                         <td>{bias.member.enName}</td>
                                     </tr>
                                 )
@@ -120,7 +170,7 @@ export default function Home() {
                     </tbody>
                 </table>
                 {
-                    showAddForm ? <AddBiasForm /> : 
+                    showAddForm ? <AddBiasForm addBias={addBias} /> : 
                         <button onClick={() => setShowAddFrom(true)}>Add</button>
                 }
             </main>

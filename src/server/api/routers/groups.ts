@@ -11,16 +11,19 @@ export const groupsRouter = createTRPCRouter({
         });
 
         const groups = {} as Record<string, any>;
+        const groupArr = [];
 
         for (const member of members) {
-            if (!(member.group.name in groups)) {
-                groups[member.group.name] = member.group;
+            const name = member.group.enName;
+            if (!(name in groups)) {
+                groups[name] = true;
+                groupArr.push(member.group);
             }
         }
 
         return {
             members,
-            groups
+            groups: groupArr
         };
     }),
 });
