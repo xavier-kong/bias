@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { api } from "~/utils/api";
 import { useUser, SignIn } from "@clerk/nextjs";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Spinner from "~/components/spinner";
 
 function ProfileNameForm() {
@@ -96,9 +96,10 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
             }
             {
                 selectedMember ? <button onClick={(e) => {
-                    e.preventDefault();
                     if (selectedMemberId && selectedGroupId) {
                         addBias(selectedMemberId, selectedGroupId);
+                        setSelectedGroup("");
+                        setSelectedMember(undefined);
                     } else {
                         // error
                     }
@@ -112,7 +113,18 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
 export default function Home() {
     const { isLoaded, isSignedIn, user } = useUser();
     const [ showAddForm, setShowAddFrom ] = useState(false);
+    const ctx = api.useContext();
     const biases = api.user.fetchUserBiases.useQuery();
+    const { mutate: updateUserBiasMutation, isLoading: updateUserBiasMutationLoading } = api.user.updateUserBias.useMutation({
+        onSuccess: () => {
+            void ctx.user.fetchUserBiases.invalidate();
+        }
+    });
+    const { mutate: addUserBiasMutation, isLoading: addUserBiasMutationLoading } = api.user.addUserBias.useMutation({
+        onSuccess: () => {
+            void ctx.user.fetchUserBiases.invalidate();
+        }
+    });
 
     if (!isSignedIn) {
         return (<div>Test<SignIn /></div>)
@@ -122,24 +134,18 @@ export default function Home() {
         return <ProfileNameForm />
     }
 
-    while (biases.isLoading) {
+    while (biases.isLoading || addUserBiasMutationLoading || updateUserBiasMutationLoading) {
         return <Spinner />
     }
 
     const addBias = (memberId: number, groupId: number) => {
-        const alreadyHasBias = biases.data?.userBiases.some(bias => bias.memberId === memberId);
-        if (alreadyHasBias) {
-            // early return
-        }
-
-        const hasGroupBias = biases.data?.userBiases.some(bias => bias.member.groupId === groupId);
-        if (hasGroupBias) {
-            // update not add
+        const bias = biases.data?.userBiases.find(bias => bias.member.groupId === groupId);
+        if (bias) {
+            updateUserBiasMutation({ memberId, biasId: bias.id });
         } else {
-            // add new bias
+            addUserBiasMutation({ memberId });
         }
     }
-
 
     return (
         <>

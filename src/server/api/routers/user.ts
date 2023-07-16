@@ -45,7 +45,23 @@ export const userRouter = createTRPCRouter({
     addUserBias: privateProcedure
     .input(z.object({ memberId: z.number( )}))
     .mutation(async ({ input, ctx }) => {
+        await ctx.prisma.bias.create({
+            data: {
+                userId: ctx.userId,
+                memberId: input.memberId
+            }
+        });
     }),
     updateUserBias: privateProcedure
-
+    .input(z.object({ biasId: z.number( ), memberId: z.number( ) }))
+    .mutation(async ({ input, ctx }) => {
+        await ctx.prisma.bias.update({
+            where: {
+                id: input.biasId
+            },
+            data: {
+                memberId: input.memberId
+            }
+        });
+    })
 });
