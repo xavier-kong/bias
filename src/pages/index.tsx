@@ -1,8 +1,9 @@
 import Head from "next/head";
 import { api } from "~/utils/api";
-import { useUser, SignIn } from "@clerk/nextjs";
+import { useUser, SignIn, UserButton } from "@clerk/nextjs";
 import { useContext, useState } from "react";
 import Spinner from "~/components/spinner";
+import BiasList from "~/components/biasList";
 
 function ProfileNameForm() {
     const [profileName, setProfileName] = useState("");
@@ -24,9 +25,9 @@ function ProfileNameForm() {
 
     return (
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
-            <div>Enter your profile name</div><br />
+            <div>Enter your nickname!</div><br />
             <div className="flex items-center border-b border-teal-500 py-2">
-                <input className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter here!" aria-label="Full name" value={profileName} onChange={onNameChange}/>
+                <input className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter your nickname here!" aria-label="Full name" value={profileName} onChange={onNameChange}/>
                 {
                     mutation.isLoading ? <Spinner /> : <button className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
                         Enter
@@ -70,7 +71,7 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                     {
                         groups.map(group => {
                             return <option key={group.id}>{group.enName}</option>
-                        })
+                    })
                     }
                 </select>
             </div>
@@ -103,7 +104,7 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                     } else {
                         // error
                     }
-                }}>submit</button> : <div></div>
+                    }}>submit</button> : <div></div>
             }
         </div>
     )
@@ -155,30 +156,12 @@ export default function Home() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className="flex min-h-screen flex-col items-center justify-center">
-                <table className="table-auto">
-                    <thead>
-                        <tr>
-                            <th>Group</th>
-                            <th>Member</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            biases.data?.userBiases?.map(bias => {
-                                return (
-                                    <tr key={bias.memberId}>
-                                        <td>{bias.member.group.enName}</td>
-                                        <td>{bias.member.enName}</td>
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody>
-                </table>
+                <BiasList biases={biases.data} emptyMessage="Click the add button below to add" />
                 {
                     showAddForm ? <AddBiasForm addBias={addBias} /> : 
                         <button onClick={() => setShowAddFrom(true)}>Add</button>
                 }
+                <UserButton />
             </main>
         </>
     );

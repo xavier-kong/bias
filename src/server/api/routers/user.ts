@@ -23,6 +23,40 @@ export const userRouter = createTRPCRouter({
             throw new TRPCError({ message: "An error has ocurred. Please try submitting again.", code: "INTERNAL_SERVER_ERROR"});
         }
     }),
+    fetchUserBiasesByName: publicProcedure
+    .input(z.object({ name: z.string() }))
+    .query(async ({ input, ctx }) => {
+        const name = input.name;
+        const user = await ctx.prisma.user.findUnique({
+            where: {
+                profileName: name
+            }
+        });
+
+        if (!user?.id) {
+            throw new TRPCError({ message: "user not found" , code: "NOT_FOUND" });
+        }
+
+        const userId = user.id;
+
+        const userBiases = await ctx.prisma.bias.findMany({
+            where: {
+                userId
+            },
+            include: {
+                member: {
+                    include: {
+                        group: true
+                    }
+                }
+            }
+        });
+
+        return {
+            userBiases
+        };
+    }),
+
     fetchUserBiases: privateProcedure
     .query(async ({ ctx }) => {
         const userBiases = await ctx.prisma.bias.findMany({ 
