@@ -10,7 +10,15 @@ export const userRouter = createTRPCRouter({
         const res = await ctx.prisma.user.findUnique({ where: { profileName: input.profileName }});
 
         if (res) {
-            throw new TRPCError({ message: "This username is already taken. Please try another.", code: "BAD_REQUEST"});
+            if (res.id == ctx.userId) {
+                await clerkClient.users.updateUserMetadata(ctx.userId, { publicMetadata: {
+                    profileName: input.profileName
+                }});
+
+                return;
+            } else {
+                throw new TRPCError({ message: "This username is already taken. Please try another.", code: "BAD_REQUEST"});
+            }
         }
 
         const clerkRes = await clerkClient.users.updateUserMetadata(ctx.userId, { publicMetadata: {

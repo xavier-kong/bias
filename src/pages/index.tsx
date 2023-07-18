@@ -63,8 +63,11 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                 <select className="w-full p-2.5 text-gray-500 bg-white border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600" onChange={
                     e => {
                         e.preventDefault();
-                        setSelectedGroup(e.target.value);
-                        setSelectedGroupId(e.target.options.selectedIndex);
+                        const group = groups.find(group => group.enName === e.target.value);
+                        if (group) {
+                            setSelectedGroup(group?.enName);
+                            setSelectedGroupId(group?.id);
+                    }
                     }}
                     value={selectedGroup}>
                     <option key="empty">Select a group...</option>
@@ -81,15 +84,20 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                         <select className="w-full p-2.5 text-gray-500 bg-white border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600" onChange={
                             e => {
                                 e.preventDefault();
-                                setSelectedMember(e.target.value);
-                                setSelectedMemberId(e.target.options.selectedIndex);
+                                const member = members
+                                    .filter(member => member.groupId === selectedGroupId)
+                                    .find(member => member.enName === e.target.value)
+
+                                setSelectedMember(member?.enName);
+                                setSelectedMemberId(member?.id);
                             }}
                             value={selectedMember}>
                             <option key="empty">Select a member...</option>
                             {
-                                members.filter(member => member.group.enName === selectedGroup)
+                                members
+                                .filter(member => member.group.enName === selectedGroup)
                                 .map(member => (
-                                    <option key={member.id}>{member.enName}</option>
+                                    <option key={member.id} id={member.id.toString()}>{member.enName}</option>
                                 ))
                             }
                         </select>

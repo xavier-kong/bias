@@ -1,4 +1,5 @@
 import type { GetStaticProps, NextPage } from "next";
+import Link from "next/link";
 import BiasList from "~/components/biasList";
 import Spinner from "~/components/spinner";
 import { api } from "~/utils/api";
@@ -21,6 +22,9 @@ export const UserPage: NextPage<{ name: string }> = ({ name }) => {
         <div>
             <div>{`${name}'s biases`}</div>
             <BiasList biases={biasQuery.data} emptyMessage={`${name} has none! Go add your own!`} />
+            <Link href={`/`}>
+                <button>Go Back</button>
+            </Link>
         </div>
     )
 }
