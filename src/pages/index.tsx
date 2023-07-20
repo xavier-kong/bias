@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { api } from "~/utils/api";
 import { useUser, SignIn, UserButton } from "@clerk/nextjs";
-import { useContext, useState } from "react";
+import { useContext, useState, useRef, useEffect, RefObject } from "react";
 import Spinner from "~/components/spinner";
 import BiasList from "~/components/biasList";
 
@@ -73,9 +73,7 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                     <option key="empty">Select a group...</option>
                     {
                         groups.map(group => {
-                            return <option key={group.id}>{group.enName}</option>
-                    })
-                    }
+                            return <option key={group.id}>{group.enName}</option> }) }
                 </select>
             </div>
             {
@@ -119,10 +117,34 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
 
 }
 
+const useOutsideClick = (callback: () => void) => {
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (ref.current && !ref.current.contains(event.target as Node)) {
+                callback();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [callback]);
+
+    return ref;
+};
+
 export default function Home() {
     const { isLoaded, isSignedIn, user } = useUser();
     const [ showAddForm, setShowAddFrom ] = useState(false);
     const ctx = api.useContext();
+    const outsideClickRef = useOutsideClick(() => {
+        setShowAddFrom(false);
+    });
+
     const biases = api.user.fetchUserBiases.useQuery();
     const { mutate: updateUserBiasMutation, isLoading: updateUserBiasMutationLoading } = api.user.updateUserBias.useMutation({
         onSuccess: () => {
@@ -167,7 +189,7 @@ export default function Home() {
                 <BiasList biases={biases.data} emptyMessage="Click the add button below to add" />
                 {
                     showAddForm ? 
-                        <div>
+                        <div ref={outsideClickRef}>
                             <AddBiasForm addBias={addBias} /> 
                         </div>: <div></div>
                 }
