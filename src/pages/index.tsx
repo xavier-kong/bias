@@ -166,9 +166,12 @@ export default function Home() {
             <main className="flex min-h-screen flex-col items-center justify-center">
                 <BiasList biases={biases.data} emptyMessage="Click the add button below to add" />
                 {
-                    showAddForm ? <AddBiasForm addBias={addBias} /> : 
-                        <button onClick={() => setShowAddFrom(true)}>Add</button>
+                    showAddForm ? 
+                        <div>
+                            <AddBiasForm addBias={addBias} /> 
+                        </div>: <div></div>
                 }
+                <button onClick={() => setShowAddFrom(!showAddForm)}>{showAddForm ? "Close" : "Add"}</button>
                 <UserButton />
             </main>
         </>

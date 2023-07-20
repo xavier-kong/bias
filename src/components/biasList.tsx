@@ -27,10 +27,17 @@ function BiasList({ biases, emptyMessage }: { biases: BiasQueryOutput | undefine
                         return (
                             <tr key={bias.memberId}>
                                 <td>
-                                    <Image src={bias.member.group.logoUrl} alt={`logo for ${bias.member.group.enName}`}/>
-                                    {bias.member.group.enName}
+                                    <div className="flex flex-row space-x-4 items-center">
+                                        <Image src={bias.member.group.logoUrl} alt={`logo for ${bias.member.group.enName}`} width={64} height={64} className="" />
+                                        <div>{bias.member.group.enName}</div>
+                                    </div>
                                 </td>
-                                <td>{bias.member.enName}</td>
+                                <td>
+                                    <div className="flex flex-row space-x-4 items-center">
+                                        <div>{bias.member.enName}</div>
+                                        <Image src={bias.member.picUrl} alt={`pic for for ${bias.member.enName}`} width={64} height={64} className="" />
+                                    </div>
+                                </td>
                             </tr>
                         )
                     })
