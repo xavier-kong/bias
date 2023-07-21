@@ -32,15 +32,13 @@ function BiasList({ biases, emptyMessage }: { biases: BiasQueryOutput | undefine
                                         <div>{bias.member.group.enName}</div>
                                     </div>
                                 </td>
-                                <td>
-                                    <div className="flex flex-row space-x-4 items-center">
-                                        <div>{bias.member.enName}</div>
-                                        <Image src={bias.member.picUrl} alt={`pic for for ${bias.member.enName}`} width={64} height={64} className="" />
-                                    </div>
+                                <td className="flex space-x-7 justify-between items-center">
+                                    <div className="">{bias.member.enName}</div>
+                                    <Image src={bias.member.picUrl} alt={`pic for for ${bias.member.enName}`} width={99999} height={99999} className="rounded-full shrink-0 grow-0 h-12 w-12 float-right" />
                                 </td>
                             </tr>
                         )
-                    })
+                })
                 }
             </tbody>
         </table>
