@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { api } from "~/utils/api";
+import Image from 'next/image';
 import { useUser, SignIn, UserButton } from "@clerk/nextjs";
 import { useContext, useState, useRef, useEffect, RefObject } from "react";
 import Spinner from "~/components/spinner";
@@ -58,7 +59,6 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
 
     return (
         <div>
-            Addbias form
             <div className="relative w-full lg:max-w-sm">
                 <select className="w-full p-2.5 text-gray-500 bg-white border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600" onChange={
                     e => {
@@ -73,7 +73,14 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                     <option key="empty">Select a group...</option>
                     {
                         groups.map(group => {
-                            return <option key={group.id}>{group.enName}</option> }) }
+                            return (
+                                <option key={group.id}>
+                                    <Image src={group.logoUrl} alt={`logo for ${group.enName}`} width={32} height={32} />
+                                    <div>{group.enName}</div>
+                                </option>)
+                    }
+                    ) 
+                    }
                 </select>
             </div>
             {
@@ -102,15 +109,17 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                     </div> : <div></div>
             }
             {
-                selectedMember ? <button onClick={(e) => {
-                    if (selectedMemberId && selectedGroupId) {
-                        addBias(selectedMemberId, selectedGroupId);
-                        setSelectedGroup("");
-                        setSelectedMember(undefined);
-                    } else {
-                        // error
-                    }
-                    }}>submit</button> : <div></div>
+                selectedMember ? 
+                    <button onClick={() => {
+                        if (selectedMemberId && selectedGroupId) {
+                            addBias(selectedMemberId, selectedGroupId);
+                            setSelectedGroup("");
+                            setSelectedMember(undefined);
+                        } else {
+                            // error
+                        }
+                        }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add
+                    </button> : <div></div>
             }
         </div>
     )
@@ -186,7 +195,9 @@ export default function Home() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className="flex min-h-screen flex-col items-center justify-center">
-                <BiasList biases={biases.data} emptyMessage="Click the add button below to add" />
+                {
+                    showAddForm ? <></> : <BiasList biases={biases.data} emptyMessage="Click the add button below to add" />
+                }
                 {
                     showAddForm ? 
                         <div ref={outsideClickRef}>

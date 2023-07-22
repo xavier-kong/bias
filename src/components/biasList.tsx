@@ -14,7 +14,7 @@ function BiasList({ biases, emptyMessage }: { biases: BiasQueryOutput | undefine
     const userBiases = biases.userBiases;
 
     return (
-        <table className="table-auto border-separate border-spacing-x-4">
+        <table className="table-auto border-separate border-spacing-x-4 border-spacing-y-4">
             <thead>
                 <tr className="text-left">
                     <th>Group</th>
@@ -28,7 +28,7 @@ function BiasList({ biases, emptyMessage }: { biases: BiasQueryOutput | undefine
                             <tr key={bias.memberId}>
                                 <td>
                                     <div className="flex flex-row space-x-4 items-center">
-                                        <Image src={bias.member.group.logoUrl} alt={`logo for ${bias.member.group.enName}`} width={64} height={64} className="" />
+                                        <Image src={bias.member.group.logoUrl} alt={`logo for ${bias.member.group.enName}`} width={32} height={32} className="" />
                                         <div>{bias.member.group.enName}</div>
                                     </div>
                                 </td>
@@ -38,7 +38,7 @@ function BiasList({ biases, emptyMessage }: { biases: BiasQueryOutput | undefine
                                 </td>
                             </tr>
                         )
-                })
+                    })
                 }
             </tbody>
         </table>
