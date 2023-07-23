@@ -27,7 +27,8 @@ function ProfileNameForm() {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        mutation.mutate({ profileName });
+        const editedProfileName = profileName.replaceAll(" ", "-");
+        mutation.mutate({ profileName: editedProfileName });
     }
 
     return (
