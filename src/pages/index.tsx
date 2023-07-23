@@ -10,7 +10,7 @@ import type { AppRouter } from "~/server/api/root";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type Member = RouterOutput["group"]["fetchAllMembers"]["members"][0];
-
+type Bias = RouterOutput['user']['fetchUserBiases']['userBiases'][0];
 
 function ProfileNameForm() {
     const [profileName, setProfileName] = useState("");
@@ -185,7 +185,7 @@ export default function Home() {
     }
 
     const addBias = (memberId: number, groupId: number) => {
-        const bias = biases.data?.userBiases.find(bias => bias.member.groupId === groupId);
+        const bias = biases.data?.userBiases.find((bias: Bias) => bias.member.groupId === groupId);
         if (bias) {
             updateUserBiasMutation({ memberId, biasId: bias.id });
         } else {
