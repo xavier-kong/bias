@@ -4,6 +4,7 @@ import Image from 'next/image';
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type BiasQueryOutput = RouterOutput['user']['fetchUserBiases'];
+type Bias = RouterOutput['user']['fetchUserBiases']['userBiases'][0];
 
 function BiasList({ biases, emptyMessage }: { biases: BiasQueryOutput | undefined, emptyMessage: string }) {
     if (!biases) {
@@ -23,7 +24,7 @@ function BiasList({ biases, emptyMessage }: { biases: BiasQueryOutput | undefine
             </thead>
             <tbody>
                 {
-                    userBiases.map(bias => {
+                    userBiases.map((bias: Bias) => {
                         return (
                             <tr key={bias.memberId}>
                                 <td>
