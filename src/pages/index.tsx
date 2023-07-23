@@ -5,6 +5,12 @@ import { useUser, SignIn, UserButton } from "@clerk/nextjs";
 import { useContext, useState, useRef, useEffect, RefObject } from "react";
 import Spinner from "~/components/spinner";
 import BiasList from "~/components/biasList";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "~/server/api/root";
+
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type Member = RouterOutput["group"]["fetchAllMembers"]["members"][0];
+
 
 function ProfileNameForm() {
     const [profileName, setProfileName] = useState("");
@@ -90,8 +96,8 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                             e => {
                                 e.preventDefault();
                                 const member = members
-                                    .filter(member => member.groupId === selectedGroupId)
-                                    .find(member => member.enName === e.target.value)
+                                    .filter((member: Member) => member.groupId === selectedGroupId)
+                                    .find((member: Member) => member.enName === e.target.value)
 
                                 setSelectedMember(member?.enName);
                                 setSelectedMemberId(member?.id);
@@ -100,8 +106,8 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                             <option key="empty">Select a member...</option>
                             {
                                 members
-                                .filter(member => member.group.enName === selectedGroup)
-                                .map(member => (
+                                .filter((member: Member) => member.group.enName === selectedGroup)
+                                .map((member: Member) => (
                                     <option key={member.id} id={member.id.toString()}>{member.enName}</option>
                                 ))
                             }
