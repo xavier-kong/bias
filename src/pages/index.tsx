@@ -177,7 +177,8 @@ export default function Home() {
     }
 
     if (isSignedIn && user && !user.publicMetadata?.profileName) {
-        return <ProfileNameForm />
+        return (
+            <div className="flex min-h-screen flex-col items-center justify-center"><ProfileNameForm /></div>)
     }
 
     while (biases.isLoading || addUserBiasMutationLoading || updateUserBiasMutationLoading) {
