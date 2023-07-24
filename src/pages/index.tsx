@@ -74,7 +74,7 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                         if (group) {
                             setSelectedGroup(group?.enName);
                             setSelectedGroupId(group?.id);
-                    }
+                        }
                     }}
                     value={selectedGroup}>
                     <option key="empty">Select a group...</option>
@@ -85,8 +85,8 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                                     <Image src={group.logoUrl} alt={`logo for ${group.enName}`} width={32} height={32} />
                                     <div>{group.enName}</div>
                                 </option>)
-                    }
-                    ) 
+                        }
+                        ) 
                     }
                 </select>
             </div>
@@ -125,7 +125,7 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                         } else {
                             // error
                         }
-                        }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add
+                    }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add
                     </button> : <div></div>
             }
         </div>
