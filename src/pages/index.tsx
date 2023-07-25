@@ -7,10 +7,97 @@ import Spinner from "~/components/spinner";
 import BiasList from "~/components/biasList";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "~/server/api/root";
+import { Check, ChevronsUpDown } from "lucide-react"
+
+import { cn } from "../utils/cn";
+import { Button } from "../components/ui/button";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+} from "../components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "../components/ui/popover"
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type Member = RouterOutput["group"]["fetchAllMembers"]["members"][0];
 type Bias = RouterOutput['user']['fetchUserBiases']['userBiases'][0];
+
+export function ComboboxDemo() {
+    const [open, setOpen] = useState(false)
+    const [value, setValue] = useState("")
+
+    const frameworks = [
+        {
+            value: "next.js",
+            label: "Next.js",
+        },
+        {
+            value: "sveltekit",
+            label: "SvelteKit",
+        },
+        {
+            value: "nuxt.js",
+            label: "Nuxt.js",
+        },
+        {
+            value: "remix",
+            label: "Remix",
+        },
+        {
+            value: "astro",
+            label: "Astro",
+        },
+    ]
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-[200px] justify-between"
+                >
+                    {value
+                        ? frameworks.find((framework) => framework.value === value)?.label
+                        : "Select framework..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-0">
+                <Command>
+                    <CommandInput placeholder="Search framework..." />
+                    <CommandEmpty>No framework found.</CommandEmpty>
+                    <CommandGroup>
+                        {frameworks.map((framework) => (
+                            <CommandItem
+                                key={framework.value}
+                                onSelect={(currentValue) => {
+                                    setValue(currentValue === value ? "" : currentValue)
+                                    setOpen(false)
+                                }}
+                            >
+                                <Check
+                                    className={cn(
+                                        "mr-2 h-4 w-4",
+                                        value === framework.value ? "opacity-100" : "opacity-0"
+                                    )}
+                                />
+                                {framework.label}
+                            </CommandItem>
+                        ))}
+                    </CommandGroup>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    )
+}
 
 function ProfileNameForm() {
     const [profileName, setProfileName] = useState("");
@@ -213,7 +300,8 @@ export default function Home() {
                             <AddBiasForm addBias={addBias} /> 
                         </div>: <div></div>
                 }
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => setShowAddFrom(!showAddForm)}>{showAddForm ? "Close" : "Add"}</button>
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4" onClick={() => setShowAddFrom(!showAddForm)}>{showAddForm ? "Close" : "Add"}</button>
+                <ComboboxDemo />
             </main>
         </>
     );
