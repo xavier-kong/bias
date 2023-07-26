@@ -28,77 +28,6 @@ type RouterOutput = inferRouterOutputs<AppRouter>;
 type Member = RouterOutput["group"]["fetchAllMembers"]["members"][0];
 type Bias = RouterOutput['user']['fetchUserBiases']['userBiases'][0];
 
-export function ComboboxDemo() {
-    const [open, setOpen] = useState(false)
-    const [value, setValue] = useState("")
-
-    const frameworks = [
-        {
-            value: "next.js",
-            label: "Next.js",
-        },
-        {
-            value: "sveltekit",
-            label: "SvelteKit",
-        },
-        {
-            value: "nuxt.js",
-            label: "Nuxt.js",
-        },
-        {
-            value: "remix",
-            label: "Remix",
-        },
-        {
-            value: "astro",
-            label: "Astro",
-        },
-    ]
-
-    return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-[200px] justify-between"
-                >
-                    {value
-                        ? frameworks.find((framework) => framework.value === value)?.label
-                        : "Select framework..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-                <Command>
-                    <CommandInput placeholder="Search framework..." />
-                    <CommandEmpty>No framework found.</CommandEmpty>
-                    <CommandGroup>
-                        {frameworks.map((framework) => (
-                            <CommandItem
-                                key={framework.value}
-                                onSelect={(currentValue) => {
-                                    setValue(currentValue === value ? "" : currentValue)
-                                    setOpen(false)
-                                }}
-                            >
-                                <Check
-                                    className={cn(
-                                        "mr-2 h-4 w-4",
-                                        value === framework.value ? "opacity-100" : "opacity-0"
-                                    )}
-                                />
-                                {framework.label}
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
-                </Command>
-            </PopoverContent>
-        </Popover>
-    )
-}
-
 function ProfileNameForm() {
     const [profileName, setProfileName] = useState("");
     const mutation = api.user.addProfileName.useMutation({
@@ -136,8 +65,11 @@ function ProfileNameForm() {
 
 function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number) => void }) {
     const membersQuery = api.group.fetchAllMembers.useQuery();
+    const [ openSelectGroup, setOpenSelectGroup ] = useState(false);
     const [ selectedGroup, setSelectedGroup ] = useState("");
     const [ selectedGroupId, setSelectedGroupId ] = useState<number | undefined>();
+
+    const [ openSelectMember, setOpenSelectMember ] = useState(false);
     const [ selectedMember, setSelectedMember ] = useState<string | undefined>();
     const [ selectedMemberId, setSelectedMemberId ] = useState<number | undefined>();
 
@@ -153,68 +85,146 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
 
     return (
         <div>
-            <div className="relative w-full lg:max-w-sm">
-                <select className="w-full p-2.5 text-gray-500 bg-white border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600" onChange={
-                    e => {
-                        e.preventDefault();
-                        const group = groups.find(group => group.enName === e.target.value);
-                        if (group) {
-                            setSelectedGroup(group?.enName);
-                            setSelectedGroupId(group?.id);
-                        }
-                    }}
-                    value={selectedGroup}>
-                    <option key="empty">Select a group...</option>
-                    {
-                        groups.map(group => {
-                            return (
-                                <option key={group.id}>
-                                    <Image src={group.logoUrl} alt={`logo for ${group.enName}`} width={32} height={32} />
-                                    <div>{group.enName}</div>
-                                </option>)
-                        }
-                        ) 
-                    }
-                </select>
+            <div>
+                <Popover open={openSelectGroup} onOpenChange={setOpenSelectGroup}>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openSelectGroup}
+                            className="w-[250px] justify-between"
+                        >
+                            {selectedGroup
+                                ? selectedGroup
+                                : "Select group..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[250px] p-0">
+                        <Command>
+                            <CommandInput placeholder="Search group..." />
+                            <CommandEmpty>No group found.</CommandEmpty>
+                            <CommandGroup>
+                                {groups.map((group) => (
+                                    <CommandItem
+                                        key={group.id}
+                                        onSelect={() => {
+                                            setSelectedGroup(group.enName);
+                                            setSelectedGroupId(group.id);
+                                            setOpenSelectGroup(false);
+                                        }}
+                                    >
+                                        <Check
+                                            className={cn(
+                                                "mr-2 h-4 w-4",
+                                                selectedGroup === group.enName ? "opacity-100" : "opacity-0"
+                                            )}
+                                        />
+                                        {group.enName}
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
             </div>
             {
                 selectedGroup ?             
-                    <div className="relative w-full lg:max-w-sm">
-                        <select className="w-full p-2.5 text-gray-500 bg-white border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600" onChange={
-                            e => {
-                                e.preventDefault();
-                                const member = members
-                                    .filter((member: Member) => member.groupId === selectedGroupId)
-                                    .find((member: Member) => member.enName === e.target.value)
+                    <div className="py-2">
+                        <Popover open={openSelectMember} onOpenChange={setOpenSelectMember} >
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={openSelectMember}
+                                    className="w-[250px] justify-between"
+                                >
+                                    {selectedMember
+                                        ? selectedMember
+                                        : "Select member..."}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[250px] p-0">
+                                <Command>
+                                    <CommandInput placeholder="Search member..." />
+                                    <CommandEmpty>No members found.</CommandEmpty>
+                                    <CommandGroup>
+                                        {
+                                            members
+                                            .filter((member: Member) => member.group.enName === selectedGroup)
+                                            .map((member: Member) => (
+                                                <CommandItem
+                                                    key={member.id}
+                                                    onSelect={() => {
+                                                        setSelectedMember(member.enName);
+                                                        setSelectedMemberId(member.id);
+                                                        setOpenSelectMember(false);
+                                                    }}
+                                                >
+                                                    <Check
+                                                        className={cn(
+                                                            "mr-2 h-4 w-4",
+                                                            selectedMember === member.enName ? "opacity-100" : "opacity-0"
+                                                        )}
+                                                    />
+                                                    {member.enName}
+                                                </CommandItem>
+                                            ))
+                                        }
+                                    </CommandGroup>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
 
-                                setSelectedMember(member?.enName);
-                                setSelectedMemberId(member?.id);
-                            }}
-                            value={selectedMember}>
-                            <option key="empty">Select a member...</option>
-                            {
-                                members
-                                .filter((member: Member) => member.group.enName === selectedGroup)
-                                .map((member: Member) => (
-                                    <option key={member.id} id={member.id.toString()}>{member.enName}</option>
-                                ))
+
+
+
+
+                        {/*
+                        <div className="relative w-full lg:max-w-sm">
+                            <select className="w-full p-2.5 text-gray-500 bg-white border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600" onChange={
+                                e => {
+                                    e.preventDefault();
+                                    const member = members
+                                        .filter((member: Member) => member.groupId === selectedGroupId)
+                                        .find((member: Member) => member.enName === e.target.value)
+
+                                    setSelectedMember(member?.enName);
+                                    setSelectedMemberId(member?.id);
+                                }}
+                                value={selectedMember}>
+                                <option key="empty">Select a member...</option>
+                                {
+                                    members
+                                    .filter((member: Member) => member.group.enName === selectedGroup)
+                                    .map((member: Member) => (
+                                        <option key={member.id} id={member.id.toString()}>{member.enName}</option>
+                                    ))
+                                }
+                            </select>
+                        </div> 
+                          */}
+
+
+                    </div>: <div></div>
+            }
+
+            <div className="items-center">
+                {
+                    selectedMember ? 
+                        <button onClick={() => {
+                            if (selectedMemberId && selectedGroupId) {
+                                addBias(selectedMemberId, selectedGroupId);
+                                setSelectedGroup("");
+                                setSelectedMember(undefined);
+                            } else {
+                                // error
                             }
-                        </select>
-                    </div> : <div></div>
-            }
-            {
-                selectedMember ? 
-                    <button onClick={() => {
-                        if (selectedMemberId && selectedGroupId) {
-                            addBias(selectedMemberId, selectedGroupId);
-                            setSelectedGroup("");
-                            setSelectedMember(undefined);
-                        } else {
-                            // error
-                        }
-                    }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add
-                    </button> : <div></div>
-            }
+                        }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add
+                        </button> : <div></div>
+                }
+            </div>
         </div>
     )
 
@@ -296,12 +306,12 @@ export default function Home() {
                 }
                 {
                     showAddForm ? 
-                        <div ref={outsideClickRef}>
-                            <AddBiasForm addBias={addBias} /> 
-                        </div>: <div></div>
+                        //<div ref={outsideClickRef}>
+                        <AddBiasForm addBias={addBias} /> 
+                        //</div>
+                        : <div></div>
                 }
                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4" onClick={() => setShowAddFrom(!showAddForm)}>{showAddForm ? "Close" : "Add"}</button>
-                <ComboboxDemo />
             </main>
         </>
     );
