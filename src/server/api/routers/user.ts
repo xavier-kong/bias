@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/api/trpc";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
+import ratelimit from "../rateLimiter";
 
 export const userRouter = createTRPCRouter({
     addProfileName: privateProcedure
@@ -87,6 +88,10 @@ export const userRouter = createTRPCRouter({
     addUserBias: privateProcedure
     .input(z.object({ memberId: z.number( )}))
     .mutation(async ({ input, ctx }) => {
+        const { success } = await ratelimit.limit(ctx.userId);
+
+        if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS"});
+
         await ctx.prisma.bias.create({
             data: {
                 userId: ctx.userId,
@@ -97,6 +102,10 @@ export const userRouter = createTRPCRouter({
     updateUserBias: privateProcedure
     .input(z.object({ biasId: z.number( ), memberId: z.number( ) }))
     .mutation(async ({ input, ctx }) => {
+        const { success } = await ratelimit.limit(ctx.userId);
+
+        if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS"});
+
         await ctx.prisma.bias.update({
             where: {
                 id: input.biasId
