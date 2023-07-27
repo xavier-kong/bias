@@ -1,8 +1,7 @@
 import Head from "next/head";
 import { api } from "~/utils/api";
-import Image from 'next/image';
-import { useUser, SignIn, UserButton } from "@clerk/nextjs";
-import { useContext, useState, useRef, useEffect, RefObject } from "react";
+import { useUser, SignIn } from "@clerk/nextjs";
+import { useState, useRef, useEffect } from "react";
 import Spinner from "~/components/spinner";
 import BiasList from "~/components/biasList";
 import type { inferRouterOutputs } from "@trpc/server";
@@ -251,12 +250,12 @@ const useOutsideClick = (callback: () => void) => {
 };
 
 export default function Home() {
-    const { isLoaded, isSignedIn, user } = useUser();
+    const { isSignedIn, user } = useUser();
     const [ showAddForm, setShowAddFrom ] = useState(false);
     const ctx = api.useContext();
-    const outsideClickRef = useOutsideClick(() => {
+    {/*const outsideClickRef = useOutsideClick(() => {
         setShowAddFrom(false);
-    });
+    });*/}
 
     const biases = api.user.fetchUserBiases.useQuery();
     const { mutate: updateUserBiasMutation, isLoading: updateUserBiasMutationLoading } = api.user.updateUserBias.useMutation({

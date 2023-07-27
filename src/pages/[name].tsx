@@ -8,7 +8,7 @@ import Head from "next/head";
 
 export const UserPage: NextPage<{ name: string }> = ({ name }) => {
     const biasQuery = api.user.fetchUserBiasesByName.useQuery({ name });
-    const { isSignedIn, user } = useUser();
+    const { isSignedIn } = useUser();
 
     while (biasQuery.isLoading) {
         return <Spinner />;
