@@ -250,7 +250,7 @@ const useOutsideClick = (callback: () => void) => {
 };
 
 export default function Home() {
-    const { isSignedIn, user } = useUser();
+    const { isLoaded, isSignedIn, user } = useUser();
     const [ showAddForm, setShowAddFrom ] = useState(false);
     const ctx = api.useContext();
     {/*const outsideClickRef = useOutsideClick(() => {
@@ -269,8 +269,12 @@ export default function Home() {
         }
     });
 
+    while (!isLoaded) {
+        return <Spinner />;
+    }
+
     if (!isSignedIn) {
-        return (<div>Test<SignIn /></div>)
+        return (<div><SignIn /></div>)
     }
 
     if (isSignedIn && user && !user.publicMetadata?.profileName) {
