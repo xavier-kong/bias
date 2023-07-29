@@ -14,13 +14,6 @@ export const UserPage: NextPage<{ name: string }> = ({ name }) => {
         return <Spinner />;
     }
 
-    if (biasQuery.error?.message === "user not found") {
-        // user not found page
-        return (
-            <div>user not found!</div>
-        )
-    }
-
     return (
         <>
             <Head>

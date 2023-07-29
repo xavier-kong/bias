@@ -220,7 +220,7 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                             } else {
                                 // error
                             }
-                            }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add
+                        }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add
                         </button> : <div></div>
                 }
             </div>
@@ -274,7 +274,7 @@ export default function Home() {
     }
 
     if (!isSignedIn) {
-        return (<div><SignIn /></div>)
+        return (<div className="flex min-h-screen flex-col items-center justify-center"><SignIn /></div>)
     }
 
     if (isSignedIn && user && !user.publicMetadata?.profileName) {
