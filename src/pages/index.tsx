@@ -119,7 +119,7 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                                                 selectedGroup === group.enName ? "opacity-100" : "opacity-0"
                                             )}
                                         />
-                                        {group.enName}
+                                        {group.enName}{group.krName ? ` (${group.krName})` : ""}
                                     </CommandItem>
                                 ))}
                             </CommandGroup>
@@ -167,7 +167,7 @@ function AddBiasForm({ addBias }: { addBias: (memberId: number, groupId: number)
                                                             selectedMember === member.enName ? "opacity-100" : "opacity-0"
                                                         )}
                                                     />
-                                                    {member.enName}
+                                                    {member.enName}{member.krName ? ` (${member.krName})` : ""}
                                                 </CommandItem>
                                             ))
                                         }
